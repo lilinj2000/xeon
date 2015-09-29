@@ -97,13 +97,13 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(xeondir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_xeon_OBJECTS = xeon-XeonConfig.$(OBJEXT) xeon-MData.$(OBJEXT) \
+am_xeon_OBJECTS = xeon-XeonConfig.$(OBJEXT) \
 	xeon-XeleMdSpiImpl.$(OBJEXT) xeon-XeonServer.$(OBJEXT) \
 	xeon-Main.$(OBJEXT)
 xeon_OBJECTS = $(am_xeon_OBJECTS)
 am__DEPENDENCIES_1 =
 xeon_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
@@ -220,6 +220,9 @@ am__distuninstallcheck_listfiles = $(distuninstallcheck_listfiles) \
   | sed 's|^\./|$(prefix)/|' | grep -v '$(infodir)/dir$$'
 distcleancheck_listfiles = find . -type f -print
 ACLOCAL = @ACLOCAL@
+AIR_CPPFLAGS = @AIR_CPPFLAGS@
+AIR_HOME = @AIR_HOME@
+AIR_LIBADD = @AIR_LIBADD@
 AMTAR = @AMTAR@
 AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
 AR = @AR@
@@ -354,7 +357,6 @@ top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = foreign
 xeon_SOURCES = \
 	XeonConfig.cc \
-	MData.cc \
 	XeleMdSpiImpl.cc \
 	XeonServer.cc \
 	Main.cc
@@ -362,12 +364,14 @@ xeon_SOURCES = \
 xeon_CPPFLAGS = \
 		$(BOOST_CPPFLAGS) \
 		$(SOIL_CPPFLAGS) \
-		$(XELE_CPPFLAGS)
+		$(XELE_CPPFLAGS) \
+		$(AIR_CPPFLAGS)
 
 xeon_LDADD = \
 	$(BOOST_LIBADD) \
 	$(SOIL_LIBADD) \
-	$(XELE_LIBADD)
+	$(XELE_LIBADD) \
+	$(AIR_LIBADD)
 
 xeon_LDFLAGS = $(LIBADD_DL) -Wl,--no-as-needed -pthread
 
@@ -375,8 +379,8 @@ xeon_LDFLAGS = $(LIBADD_DL) -Wl,--no-as-needed -pthread
 noinst_HEADERS = XeonConfig.hh \
 	XeonServer.hh \
 	XeonLog.hh \
-	MData.hh \
-	XeleMdSpiImpl.hh
+	XeleMdSpiImpl.hh \
+	XeleMdFtdcUserApiStructPrint.hh
 
 EXTRA_DIST = env.sh.example xeon.cfg.example log.cfg.example
 xeondir = $(bindir)
@@ -479,7 +483,6 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xeon-MData.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xeon-Main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xeon-XeleMdSpiImpl.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xeon-XeonConfig.Po@am__quote@
@@ -519,20 +522,6 @@ xeon-XeonConfig.obj: XeonConfig.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='XeonConfig.cc' object='xeon-XeonConfig.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(xeon_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o xeon-XeonConfig.obj `if test -f 'XeonConfig.cc'; then $(CYGPATH_W) 'XeonConfig.cc'; else $(CYGPATH_W) '$(srcdir)/XeonConfig.cc'; fi`
-
-xeon-MData.o: MData.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(xeon_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT xeon-MData.o -MD -MP -MF $(DEPDIR)/xeon-MData.Tpo -c -o xeon-MData.o `test -f 'MData.cc' || echo '$(srcdir)/'`MData.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/xeon-MData.Tpo $(DEPDIR)/xeon-MData.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='MData.cc' object='xeon-MData.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(xeon_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o xeon-MData.o `test -f 'MData.cc' || echo '$(srcdir)/'`MData.cc
-
-xeon-MData.obj: MData.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(xeon_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT xeon-MData.obj -MD -MP -MF $(DEPDIR)/xeon-MData.Tpo -c -o xeon-MData.obj `if test -f 'MData.cc'; then $(CYGPATH_W) 'MData.cc'; else $(CYGPATH_W) '$(srcdir)/MData.cc'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/xeon-MData.Tpo $(DEPDIR)/xeon-MData.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='MData.cc' object='xeon-MData.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(xeon_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o xeon-MData.obj `if test -f 'MData.cc'; then $(CYGPATH_W) 'MData.cc'; else $(CYGPATH_W) '$(srcdir)/MData.cc'; fi`
 
 xeon-XeleMdSpiImpl.o: XeleMdSpiImpl.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(xeon_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT xeon-XeleMdSpiImpl.o -MD -MP -MF $(DEPDIR)/xeon-XeleMdSpiImpl.Tpo -c -o xeon-XeleMdSpiImpl.o `test -f 'XeleMdSpiImpl.cc' || echo '$(srcdir)/'`XeleMdSpiImpl.cc

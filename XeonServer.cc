@@ -3,8 +3,6 @@
 #include "XeleMdSpiImpl.hh"
 #include "XeleMdFtdcUserApiStructPrint.hh"
 
-#include "boost/tokenizer.hpp"
-
 #include <stddef.h>
 
 #define MEMB_SIZEOF(st_type, member) sizeof(((st_type*)0)->member)
@@ -25,19 +23,15 @@ XeonServer::XeonServer(int argc, char* argv[]):
   {
     config_.reset( new XeonConfig(argc, argv) );
 
-    boost::tokenizer<> tok( config_->xeonOptions()->instrus_filter );
-    for( boost::tokenizer<>::iterator beg=tok.begin(); beg!=tok.end(); ++beg )
-    {
-      XEON_DEBUG <<"instrus filter: " <<*beg;
-      instrus_filter_.insert(*beg);
-    }
-
-    md_file_.reset( new MData(config_->xeonOptions()->md_file) );
+    md_file_.reset( new air::MData(config_->xeonOptions()->md_file,
+                              config_->xeonOptions()->instrus_filter) );
 
     xele_md_spi_.reset( new XeleMdSpiImpl() );
     xele_md_api_.reset( CXeleMdApi::CreateMdApi(xele_md_spi_.get()) );
 
     login();
+
+    go();
   }
   catch( std::exception& e)
   {
@@ -61,7 +55,11 @@ void XeonServer::login()
   S_INPUT(&login_info, CXeleMdFtdcReqUserLoginField, Password, config_->xeonOptions()->passwd.data());
   S_INPUT(&login_info, CXeleMdFtdcReqUserLoginField, ProtocolInfo, "protocol");
 
-  XEON_PDU <<login_info;
+  XEON_DEBUG <<config_->xeonOptions()->front_address;
+  XEON_DEBUG <<config_->xeonOptions()->mcast_address;
+  XEON_DEBUG <<config_->xeonOptions()->nic;
+
+  XEON_DEBUG <<login_info;
 
   int ret = xele_md_api_->LoginInit(config_->xeonOptions()->front_address.data(),
                                     config_->xeonOptions()->mcast_address.data(),
@@ -77,8 +75,27 @@ void XeonServer::login()
 
     throw std::runtime_error("Login failed.");
   }
+  
+}
 
-         
+void XeonServer::go()
+{
+  XEON_TRACE <<"XeonServer::go()";
+
+  XEON_INFO <<"version: " <<xele_md_api_->GetVersion();
+
+  MarketDataTick tick;
+  do
+  {
+    if( xele_md_api_->RecvMarketDataTick(&tick) )
+    {
+      md_file_->pushMData( tick.data.InstrumentID,
+                           tick.data.UpdateTime,
+                           tick.data.UpdateMillisec);
+    }
+    
+  }while( true );
+
   
 }
 

@@ -35,18 +35,6 @@ AC_SUBST(LT_AGE)
 home_3rd=`pwd`/../../3rd
 home_es=`pwd`/../../es
 
-dnl soil lib
-AC_ARG_WITH([soil],
-    [AS_HELP_STRING([--with-soil],
-        [home path of the soil, defaults to $home_es/soil])],
-    [SOIL_HOME="$withval"],
-    [SOIL_HOME="$home_es/soil"])
-AC_SUBST([SOIL_HOME])
-
-SOIL_CPPFLAGS="-I$SOIL_HOME/include"
-SOIL_LIBADD="$SOIL_HOME/lib/libsoil.la"
-AC_SUBST(SOIL_CPPFLAGS)
-AC_SUBST(SOIL_LIBADD)
 
 dnl boost lib
 AC_ARG_WITH([boost],
@@ -81,6 +69,33 @@ XELE_CPPFLAGS="-I$XELE_HOME"
 XELE_LIBADD="$XELE_HOME/libXeleMdAPI64.a"
 AC_SUBST(XELE_CPPFLAGS)
 AC_SUBST(XELE_LIBADD)
+
+dnl soil lib
+AC_ARG_WITH([soil],
+    [AS_HELP_STRING([--with-soil],
+        [home path of the soil, defaults to $home_es/soil])],
+    [SOIL_HOME="$withval"],
+    [SOIL_HOME="$home_es/soil"])
+AC_SUBST([SOIL_HOME])
+
+SOIL_CPPFLAGS="-I$SOIL_HOME/include"
+SOIL_LIBADD="$SOIL_HOME/lib/libsoil.la"
+AC_SUBST(SOIL_CPPFLAGS)
+AC_SUBST(SOIL_LIBADD)
+
+dnl air lib
+AC_ARG_WITH([air],
+    [AS_HELP_STRING([--with-air],
+        [home path of the air, defaults to $home_es/air])],
+    [AIR_HOME="$withval"],
+    [AIR_HOME="$home_es/air"])
+AC_SUBST([AIR_HOME])
+
+AIR_CPPFLAGS="-I$AIR_HOME/include"
+AIR_LIBADD="$AIR_HOME/lib/libair.la"
+AC_SUBST(AIR_CPPFLAGS)
+AC_SUBST(AIR_LIBADD)
+
 
 
 AC_OUTPUT([

@@ -4,8 +4,8 @@
 #include <memory>
 
 #include "XeonConfig.hh"
-#include "MData.hh"
 #include "XeleFtdcMduserApi.h"
+#include "air/MData.hh"
 
 namespace xeon
 {
@@ -19,9 +19,11 @@ class XeonServer
 
   ~XeonServer();
 
+ protected:
+
   void login();
 
- protected:
+  void go();
 
  private:
 
@@ -31,7 +33,7 @@ class XeonServer
 
   std::set<std::string> instrus_filter_;
 
-  std::auto_ptr<MData> md_file_;
+  std::auto_ptr<air::MData> md_file_;
 
   std::auto_ptr<XeleMdSpiImpl> xele_md_spi_;
   
