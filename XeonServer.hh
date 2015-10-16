@@ -5,7 +5,7 @@
 
 #include "XeonConfig.hh"
 #include "XeleFtdcMduserApi.h"
-#include "air/MData.hh"
+#include "air/MDataFile.hh"
 
 namespace xeon
 {
@@ -25,6 +25,10 @@ class XeonServer
 
   void go();
 
+  air::SpeedMData* toSpeedMData(const CXeleMdFtdcDepthMarketDataField* data);
+
+  air::CffexMData* toCffexMData(const CXeleMdFtdcDepthMarketDataField* data);
+
  private:
 
   std::auto_ptr<XeonConfig> config_;
@@ -33,7 +37,9 @@ class XeonServer
 
   std::set<std::string> instrus_filter_;
 
-  std::auto_ptr<air::MData> md_file_;
+  std::auto_ptr<air::MDataFile> md_file_;
+
+  std::auto_ptr<air::MDataFile> speed_file_;
 
   std::auto_ptr<XeleMdSpiImpl> xele_md_spi_;
   

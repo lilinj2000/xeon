@@ -30,6 +30,8 @@ XeonOptions::XeonOptions():
        "instrument")
       ("xeon.md_file", po::value<std::string>(&md_file), 
        "md file")
+      ("xeon.speed_md_file", po::value<std::string>(&speed_md_file), 
+       "speed md file")
 
       ("xeon.log_cfg", po::value<std::string>(&log_cfg), 
        "log config file")
