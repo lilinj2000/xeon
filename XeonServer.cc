@@ -3,13 +3,7 @@
 #include "XeleMdSpiImpl.hh"
 #include "XeleMdFtdcUserApiStructPrint.hh"
 
-#include <stddef.h>
-
-#define MEMB_SIZEOF(st_type, member) sizeof(((st_type*)0)->member)
-#define MEMB_CHARPTR(ptr, st_type, member) ((char*)ptr + offsetof(st_type, member))
-#define M_INPUT(ptr, CField, member, src) memcpy(MEMB_CHARPTR(ptr, CField, member), src, MEMB_SIZEOF(CField, member))
-#define S_INPUT(ptr, CField, member, src) strncpy(MEMB_CHARPTR(ptr, CField, member), src, MEMB_SIZEOF(CField, member))
-
+#include "soil/Macro.hh"
 
 namespace xeon
 {
