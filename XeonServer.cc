@@ -116,7 +116,6 @@ air::SpeedMData* XeonServer::toSpeedMData(const CXeleMdFtdcDepthMarketDataField*
   speed_data->instru = data->InstrumentID;
   speed_data->update_time = data->UpdateTime;
   speed_data->update_millisec = data->UpdateMillisec;
-  speed_data->time_stamp = boost::posix_time::microsec_clock::local_time();
 
   return speed_data.release();
 
