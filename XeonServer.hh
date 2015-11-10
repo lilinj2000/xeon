@@ -31,19 +31,19 @@ class XeonServer
 
  private:
 
-  std::auto_ptr<XeonConfig> config_;
+  std::unique_ptr<XeonConfig> config_;
 
   int sock_fd_;
 
   std::set<std::string> instrus_filter_;
 
-  std::auto_ptr<air::MDataFile> md_file_;
+  std::unique_ptr<air::MDataFile> md_file_;
 
-  std::auto_ptr<air::MDataFile> speed_file_;
+  std::unique_ptr<air::MDataFile> speed_file_;
 
-  std::auto_ptr<XeleMdSpiImpl> xele_md_spi_;
+  std::unique_ptr<XeleMdSpiImpl> xele_md_spi_;
   
-  std::auto_ptr<CXeleMdApi> xele_md_api_;
+  std::unique_ptr<CXeleMdApi> xele_md_api_;
 };
 
 };
