@@ -33,6 +33,9 @@ XeonOptions::XeonOptions():
       ("xeon.speed_md_file", po::value<std::string>(&speed_md_file), 
        "speed md file")
 
+      ("xeon.exchange", po::value<std::string>(&exchange), 
+       "exchange")
+
       ("xeon.log_cfg", po::value<std::string>(&log_cfg), 
        "log config file")
       ;

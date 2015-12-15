@@ -34,7 +34,16 @@ XeonServer::XeonServer(int argc, char* argv[]):
 
     login();
 
-    go();
+    if( config_->xeonOptions()->exchange=="cffex" )
+    {
+      cffexMd();
+    }
+#ifdef XELEMD_R972
+    else if( config_->xeonOptions()->exchange=="shfe" )
+    {
+      shfeMd();
+    }
+#endif
   }
   catch( std::exception& e)
   {
@@ -81,16 +90,70 @@ void XeonServer::login()
   
 }
 
-void XeonServer::go()
+#ifdef XELEMD_R972
+void XeonServer::shfeMd()
 {
-  XEON_TRACE <<"XeonServer::go()";
+  XEON_TRACE <<"XeonServer::shfeMd()";
+  
+  int handle = xele_md_api_->GetHandle();
+  
+  CXeleShfeMarketDataUnion mdtick;
+  memset(&mdtick, 0x0, sizeof(mdtick));
+  
+  CXeleShfeLowLevelOneMarketData low_data;
+  memset(&low_data, 0x0, sizeof(low_data));
+  
+  do
+  {
+    if (RecvShfeMarketDataTick(handle, &mdtick))
+    {
+      if (mdtick.md_type[0] == 'M')
+      {
+        if( speed_file_.get() )
+        {
+          speed_file_->putData( toSpeedMData(&(mdtick.type_high)) );
+        }
+
+        if( md_file_.get() )
+        {
+          md_file_->putData( toShfeMData(&low_data,  &(mdtick.type_high)) );
+        }
+
+        // XEON_DEBUG <<mdtick.type_high;
+      }
+      else if (mdtick.md_type[0] == 'S')
+      {
+        memcpy(&low_data, &(mdtick.type_low), sizeof(low_data));
+        // XEON_DEBUG <<mdtick.type_low;
+      }
+      else if (mdtick.md_type[0] == 'Q')
+      {
+        // XEON_DEBUG <<mdtick.type_depth;
+      }
+    }
+  }while( true );
+}
+#endif
+
+void XeonServer::cffexMd()
+{
+  XEON_TRACE <<"XeonServer::cffexMd()";
 
   XEON_INFO <<"version: " <<xele_md_api_->GetVersion();
 
+#ifdef XELEMD_R972
+  int handle = xele_md_api_->GetHandle(); 
+#endif
   MarketDataTick tick;
   do
   {
+#ifdef XELEMD_R800
     if( xele_md_api_->RecvMarketDataTick(&tick) )
+#endif
+      
+#ifdef XELEMD_R972
+    if( RecvMarketDataTick(handle, &tick) )
+#endif
     {
 
       if( speed_file_.get() )
@@ -109,6 +172,7 @@ void XeonServer::go()
   
 }
 
+
 air::SpeedMData* XeonServer::toSpeedMData(const CXeleMdFtdcDepthMarketDataField* data)
 {
   std::unique_ptr<air::SpeedMData> speed_data(new air::SpeedMData());
@@ -120,6 +184,72 @@ air::SpeedMData* XeonServer::toSpeedMData(const CXeleMdFtdcDepthMarketDataField*
   return speed_data.release();
 
 }
+
+#ifdef XELEMD_R972
+air::SpeedMData* XeonServer::toSpeedMData(const CXeleShfeHighLevelOneMarketData* data)
+{
+  std::unique_ptr<air::SpeedMData> speed_data(new air::SpeedMData());
+  
+  speed_data->instru = data->Instrument;
+  speed_data->update_time = data->UpdateTime;
+  speed_data->update_millisec = data->UpdateMillisec;
+
+  return speed_data.release();
+}
+
+air::ShfeMData* XeonServer::toShfeMData(const CXeleShfeLowLevelOneMarketData* low_data, const CXeleShfeHighLevelOneMarketData* high_data)
+{
+  std::unique_ptr<air::ShfeMData> shfe_data(new air::ShfeMData());
+  
+  // shfe_data->TradingDay
+  shfe_data->InstrumentID = high_data->Instrument;
+  // std::string ExchangeID;
+  // std::string ExchangeInstID;
+  shfe_data->LastPrice = high_data->LastPrice;
+  // double PreSettlementPrice;
+  // double PreClosePrice;
+  // double PreOpenInterest;
+  shfe_data->OpenPrice = low_data->OpenPrice;
+  shfe_data->HighestPrice = low_data->HighestPrice;
+  shfe_data->LowestPrice = low_data->LowestPrice;
+  shfe_data->Volume = high_data->Volume;
+  shfe_data->Turnover = high_data->Turnover;
+  shfe_data->OpenInterest = high_data->OpenInterest;
+  shfe_data->ClosePrice = low_data->ClosePrice;
+  shfe_data->SettlementPrice = low_data->SettlementPrice;
+  shfe_data->UpperLimitPrice = low_data->UpperLimitPrice;
+  shfe_data->LowerLimitPrice = low_data->LowerLimitPrice;
+  // double PreDelta;
+  shfe_data->CurrDelta = low_data->CurrDelta;
+  shfe_data->UpdateTime = high_data->UpdateTime;
+  shfe_data->UpdateMillisec = high_data->UpdateMillisec;
+  shfe_data->BidPrice1 = high_data->BidPrice;
+  shfe_data->BidVolume1 = high_data->BidVolume;
+  shfe_data->AskPrice1 = high_data->AskPrice;
+  shfe_data->AskVolume1 = high_data->AskVolume;
+  // double BidPrice2;
+  // double BidVolume2;
+  // double AskPrice2;
+  // double AskVolume2;
+  // double BidPrice3;
+  // double BidVolume3;
+  // double AskPrice3;
+  // double AskVolume3;
+  // double BidPrice4;
+  // double BidVolume4;
+  // double AskPrice4;
+  // double AskVolume4;
+  // double BidPrice5;
+  // double BidVolume5;
+  // double AskPrice5;
+  // double AskVolume5;
+  // double AveragePrice;
+  // std::string ActionDay;
+
+  return shfe_data.release();
+}
+
+#endif
 
 air::CffexMData* XeonServer::toCffexMData(const CXeleMdFtdcDepthMarketDataField* data)
 {

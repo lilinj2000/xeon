@@ -2,7 +2,7 @@
 
 import re
 
-struct_pattern = re.compile(r'''struct (.*)''')
+struct_pattern = re.compile(r'''struct (\S+)''')
 
 left_brace_pattern = re.compile(r'''\{''')
 
@@ -24,8 +24,8 @@ first_field = False
 header_file = open('XeleMdFtdcUserApiStructPrint.hh', 'wb')
 # cpp_file = open('FtdcUserApiStructPrint.cc', 'wb')
 
-header_file.write('#ifndef XELEMD_FTDC_USERAPI_STRUCT_PRINT_HH_\n')
-header_file.write('#define XELEMD_FTDC_USERAPI_STRUCT_PRINT_HH_\n\n')
+header_file.write('#ifndef XELEMD_FTDC_USERAPI_STRUCT_PRINT_HH\n')
+header_file.write('#define XELEMD_FTDC_USERAPI_STRUCT_PRINT_HH\n\n')
 
 header_file.write('#include <ostream>\n')
 header_file.write('#include "XeleMdFtdcUserApiStruct.h"\n\n')
@@ -43,7 +43,7 @@ for line in file:
     if result:
         # print '%s' % result.groups()
         struct_name = result.group(1)
-        object_name = 'a' + struct_name.replace('CXeleMdFtdc', '')
+        object_name = 'a' + struct_name.replace('CXele', '')
         # header_file.write('std::ostream& operator<<(std::ostream&, const %s&);\n\n' % struct_name)
         header_file.write('template< typename CharT, typename TraitsT >\n')
         header_file.write('std::basic_ostream< CharT, TraitsT >& operator<<(std::basic_ostream< CharT, TraitsT >& os, %s const& %s)\n' % (struct_name, object_name))
@@ -111,7 +111,7 @@ for line in file:
     # print line
 
 
-header_file.write('#endif // XELEMD_FTDC_USERAPI_STRUCT_PRINT_HH_\n')
+header_file.write('#endif\n')
 
     
 

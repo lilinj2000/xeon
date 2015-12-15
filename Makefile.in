@@ -300,9 +300,10 @@ SOIL_HOME = @SOIL_HOME@
 SOIL_LIBADD = @SOIL_LIBADD@
 STRIP = @STRIP@
 VERSION = @VERSION@
-XELE_CPPFLAGS = @XELE_CPPFLAGS@
-XELE_HOME = @XELE_HOME@
-XELE_LIBADD = @XELE_LIBADD@
+XELEMD_CPPFLAGS = @XELEMD_CPPFLAGS@
+XELEMD_LIBADD = @XELEMD_LIBADD@
+XELEMD_VER = @XELEMD_VER@
+XELE_HOMEMD = @XELE_HOMEMD@
 abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
 abs_top_builddir = @abs_top_builddir@
@@ -366,27 +367,31 @@ xeon_SOURCES = \
 xeon_CPPFLAGS = \
 		$(BOOST_CPPFLAGS) \
 		$(SOIL_CPPFLAGS) \
-		$(XELE_CPPFLAGS) \
+		$(XELEMD_CPPFLAGS) \
 		$(AIR_CPPFLAGS)
 
 xeon_LDADD = \
 	$(BOOST_LIBADD) \
 	$(SOIL_LIBADD) \
-	$(XELE_LIBADD) \
+	$(XELEMD_LIBADD) \
 	$(AIR_LIBADD)
 
-xeon_LDFLAGS = $(LIBADD_DL) -Wl,--no-as-needed -pthread
+xeon_LDFLAGS = $(LIBADD_DL) -Wl,--no-as-needed -pthread -lrt
 
 # header files
 noinst_HEADERS = XeonConfig.hh \
 	XeonServer.hh \
 	XeonLog.hh \
 	XeleMdSpiImpl.hh \
-	XeleMdFtdcUserApiStructPrint.hh
+	XeleMdFtdcUserApiStructPrint.hh \
+	XeleMdFtdcUserApiStructPrint_r800.hh \
+	XeleMdFtdcUserApiStructPrint_r972.hh
 
-EXTRA_DIST = env.sh.example xeon.cfg.example log.cfg.example
+installed_data = env.sh.example xeon.cfg.example log.cfg.example
+noinst_data = deploy.sh
+EXTRA_DIST = $(installed_data) $(noinst_data)
 xeondir = $(bindir)
-xeon_DATA = $(EXTRA_DIST)
+xeon_DATA = $(installed_data)
 all: all-am
 
 .SUFFIXES:

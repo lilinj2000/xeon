@@ -68,17 +68,28 @@ AC_SUBST(BOOST_CPPFLAGS)
 AC_SUBST(BOOST_LIBADD)
 
 dnl Xele_Md lib
-AC_ARG_WITH([xele],
-    [AS_HELP_STRING([--with-xele],
-        [home path of the xele, defaults to $home_3rd/xelemd_api_r800])],
-    [XELE_HOME="$withval"],
-    [XELE_HOME="$home_3rd/xelemd_api_r800"])
-AC_SUBST([XELE_HOME])
+XELEMD_R800=$home_3rd/xelemd_api_r800
+XELEMD_R972=$home_3rd/xelemd_api_r972
+XELEMD_HOME=$XELEMD_R972
+XELEMD_VER=XELEMD_R972
+AC_ARG_WITH([xelemd],
+    [AS_HELP_STRING([--with-xelemd],
+        [home path of the xelemd, defaults to $XELEMD_HOME])],
+    [XELEMD_HOME="$withval"],
+    [XELEMD_HOME="$XELEMD_HOME"])
+AC_SUBST([XELE_HOMEMD])
 
-XELE_CPPFLAGS="-I$XELE_HOME"
-XELE_LIBADD="$XELE_HOME/libXeleMdAPI64.a"
-AC_SUBST(XELE_CPPFLAGS)
-AC_SUBST(XELE_LIBADD)
+AC_ARG_WITH([xelemd-ver],
+    [AS_HELP_STRING([--with-xelemd-ver],
+        [version of the xelemd api, defaults to $XELEMD_VER])],
+    [XELEMD_VER="$withval"],
+    [XELEMD_VER="$XELEMD_VER"])
+AC_SUBST([XELEMD_VER])
+
+XELEMD_CPPFLAGS="-I$XELEMD_HOME -D$XELEMD_VER"
+XELEMD_LIBADD="$XELEMD_HOME/libXeleMdAPI64.a"
+AC_SUBST(XELEMD_CPPFLAGS)
+AC_SUBST(XELEMD_LIBADD)
 
 dnl soil lib
 AC_ARG_WITH([soil],

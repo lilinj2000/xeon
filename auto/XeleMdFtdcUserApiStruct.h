@@ -320,8 +320,59 @@ struct CXeleMdFtdcDepthMarketDataField
     TXeleMdFtdcPriceType AskPrice5;
     ///申卖量五
     TXeleMdFtdcVolumeType AskVolume5;
-
 };
+
+///上期所行情
+struct CXeleShfeHighLevelOneMarketData //'M''D'
+{
+    char Instrument [17];
+    TXeleMdFtdcTimeType UpdateTime;
+    TXeleMdFtdcMillisecType UpdateMillisec;
+    TXeleMdFtdcVolumeType Volume;
+    TXeleMdFtdcPriceType LastPrice;
+    TXeleMdFtdcMoneyType Turnover;
+    TXeleMdFtdcLargeVolumeType OpenInterest;
+    TXeleMdFtdcPriceType BidPrice;
+    TXeleMdFtdcPriceType AskPrice;
+    TXeleMdFtdcVolumeType BidVolume;
+    TXeleMdFtdcVolumeType AskVolume;
+};
+
+
+
+struct CXeleShfeDepthMarketData //'Q' 'M'
+{
+    char Instrument [8];
+    TXeleMdFtdcDirectionType Direction;
+    TXeleMdFtdcTimeType      UpdateTime;
+    TXeleMdFtdcMillisecType  UpdateMillisec;
+    TXeleMdFtdcVolumeType    Volume1;
+    TXeleMdFtdcPriceType     Price1;
+    TXeleMdFtdcVolumeType    Volume2;
+    TXeleMdFtdcPriceType     Price2;
+    TXeleMdFtdcVolumeType    Volume3;
+    TXeleMdFtdcPriceType     Price3;
+    TXeleMdFtdcVolumeType    Volume4;
+    TXeleMdFtdcPriceType     Price4;
+    TXeleMdFtdcVolumeType    Volume5;
+    TXeleMdFtdcPriceType     Price5;
+};
+
+struct CXeleShfeLowLevelOneMarketData //'S''M'
+{
+    char Instrument [9];
+    TXeleMdFtdcTimeType UpdateTime;
+    TXeleMdFtdcPriceType OpenPrice;
+    TXeleMdFtdcPriceType HighestPrice;
+    TXeleMdFtdcPriceType LowestPrice;
+    TXeleMdFtdcPriceType ClosePrice;
+    TXeleMdFtdcPriceType UpperLimitPrice;
+    TXeleMdFtdcPriceType LowerLimitPrice;
+    TXeleMdFtdcPriceType SettlementPrice;
+    TXeleMdFtdcRatioType CurrDelta;
+};
+
+
 
 #pragma pack(pop)
 

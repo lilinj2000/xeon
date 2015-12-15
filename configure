@@ -642,9 +642,10 @@ AIR_HOME
 SOIL_LIBADD
 SOIL_CPPFLAGS
 SOIL_HOME
-XELE_LIBADD
-XELE_CPPFLAGS
-XELE_HOME
+XELEMD_LIBADD
+XELEMD_CPPFLAGS
+XELEMD_VER
+XELE_HOMEMD
 BOOST_LIBADD
 BOOST_CPPFLAGS
 BOOST_HOME
@@ -785,7 +786,8 @@ with_gnu_ld
 with_sysroot
 enable_libtool_lock
 with_boost
-with_xele
+with_xelemd
+with_xelemd_ver
 with_soil
 with_air
 '
@@ -1441,8 +1443,8 @@ Optional Packages:
   --with-sysroot=DIR Search for dependent libraries within DIR
                         (or the compiler's sysroot if not specified).
   --with-boost            home path of the boost, defaults to $home_3rd/boost
-  --with-xele             home path of the xele, defaults to
-                          $home_3rd/xelemd_api_r800
+  --with-xelemd           home path of the xelemd, defaults to $XELEMD_HOME
+  --with-xelemd-ver       version of the xelemd api, defaults to $XELEMD_VER
   --with-soil             home path of the soil, defaults to $home_libs/soil
   --with-air              home path of the air, defaults to $home_libs/air
 
@@ -15330,18 +15332,32 @@ BOOST_LIBADD="$BOOST_HOME/lib/libboost_log_setup.so \
 
 
 
+XELEMD_R800=$home_3rd/xelemd_api_r800
+XELEMD_R972=$home_3rd/xelemd_api_r972
+XELEMD_HOME=$XELEMD_R972
+XELEMD_VER=XELEMD_R972
 
-# Check whether --with-xele was given.
-if test "${with_xele+set}" = set; then :
-  withval=$with_xele; XELE_HOME="$withval"
+# Check whether --with-xelemd was given.
+if test "${with_xelemd+set}" = set; then :
+  withval=$with_xelemd; XELEMD_HOME="$withval"
 else
-  XELE_HOME="$home_3rd/xelemd_api_r800"
+  XELEMD_HOME="$XELEMD_HOME"
 fi
 
 
 
-XELE_CPPFLAGS="-I$XELE_HOME"
-XELE_LIBADD="$XELE_HOME/libXeleMdAPI64.a"
+
+# Check whether --with-xelemd-ver was given.
+if test "${with_xelemd_ver+set}" = set; then :
+  withval=$with_xelemd_ver; XELEMD_VER="$withval"
+else
+  XELEMD_VER="$XELEMD_VER"
+fi
+
+
+
+XELEMD_CPPFLAGS="-I$XELEMD_HOME -D$XELEMD_VER"
+XELEMD_LIBADD="$XELEMD_HOME/libXeleMdAPI64.a"
 
 
 

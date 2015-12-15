@@ -23,7 +23,15 @@ class XeonServer
 
   void login();
 
-  void go();
+  void cffexMd();
+
+  #ifdef XELEMD_R972
+  void shfeMd();
+  
+  air::SpeedMData* toSpeedMData(const CXeleShfeHighLevelOneMarketData* data);
+  air::ShfeMData* toShfeMData(const CXeleShfeLowLevelOneMarketData* low_data, const CXeleShfeHighLevelOneMarketData* high_data);
+  
+  #endif
 
   air::SpeedMData* toSpeedMData(const CXeleMdFtdcDepthMarketDataField* data);
 
