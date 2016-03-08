@@ -51,7 +51,7 @@ class XeonServer
 
   std::unique_ptr<XeleMdSpiImpl> xele_md_spi_;
   
-  std::unique_ptr<CXeleMdApi> xele_md_api_;
+  CXeleMdApi* xele_md_api_;
 };
 
 };

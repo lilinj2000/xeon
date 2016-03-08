@@ -9,7 +9,8 @@ namespace xeon
 {
 
 XeonServer::XeonServer(int argc, char* argv[]):
-    sock_fd_(-1)
+    sock_fd_(-1),
+    xele_md_api_(nullptr)
 {
   XEON_TRACE <<"XeonServer::XeonServer()";
 
@@ -30,7 +31,7 @@ XeonServer::XeonServer(int argc, char* argv[]):
     }
 
     xele_md_spi_.reset( new XeleMdSpiImpl() );
-    xele_md_api_.reset( CXeleMdApi::CreateMdApi(xele_md_spi_.get()) );
+    xele_md_api_ = CXeleMdApi::CreateMdApi(xele_md_spi_.get());
 
     login();
 
@@ -54,6 +55,8 @@ XeonServer::XeonServer(int argc, char* argv[]):
 XeonServer::~XeonServer()
 {
   XEON_TRACE <<"XeonServer::~XeonServer()";
+
+  xele_md_api_->Release();
 }
 
 void XeonServer::login()
@@ -64,7 +67,7 @@ void XeonServer::login()
   memset(&login_info, 0x0, sizeof(login_info));
   
   S_INPUT(&login_info, CXeleMdFtdcReqUserLoginField, UserID, config_->xeonOptions()->user_id.data());
-  S_INPUT(&login_info, CXeleMdFtdcReqUserLoginField, Password, config_->xeonOptions()->passwd.data());
+  S_INPUT(&login_info, CXeleMdFtdcReqUserLoginField, Password, soil::Options::escapeHash(config_->xeonOptions()->passwd).data());
   S_INPUT(&login_info, CXeleMdFtdcReqUserLoginField, ProtocolInfo, "protocol");
 
   XEON_DEBUG <<config_->xeonOptions()->front_address;
@@ -83,8 +86,6 @@ void XeonServer::login()
   }
   else
   {
-    xele_md_api_->Release();
-
     throw std::runtime_error("Login failed.");
   }
   
