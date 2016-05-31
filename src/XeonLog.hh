@@ -1,3 +1,6 @@
+// Copyright (c) 2010
+// All rights reserved.
+
 #ifndef XEON_LOG_HH
 #define XEON_LOG_HH
 
@@ -13,7 +16,6 @@
 #define XEON_FATAL SOIL_FATAL
 #define XEON_PDU SOIL_PDU
 #define XEON_CUSTOM SOIL_CUSTOM
-
 
 #endif
 

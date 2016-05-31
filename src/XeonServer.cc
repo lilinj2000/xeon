@@ -1,74 +1,66 @@
+// Copyright (c) 2010
+// All rights reserved.
+
 #include "XeonServer.hh"
 #include "XeonLog.hh"
 #include "XeleMdSpiImpl.hh"
 #include "XeleMdFtdcUserApiStructPrint.hh"
-
 #include "soil/Macro.hh"
 
-namespace xeon
-{
+namespace xeon {
 
 XeonServer::XeonServer(int argc, char* argv[]):
     sock_fd_(-1),
-    xele_md_api_(nullptr)
-{
+    xele_md_api_(nullptr) {
   XEON_TRACE <<"XeonServer::XeonServer()";
 
-  try
-  {
+  try {
     config_.reset( new XeonConfig(argc, argv) );
 
-    if( !config_->xeonOptions()->md_file.empty() )
-    {
-      md_file_.reset( new air::MDataFile(config_->xeonOptions()->md_file,
-                                         config_->xeonOptions()->instrus_filter) );
+    if (!config_->xeonOptions()->md_file.empty()) {
+      md_file_.reset(new air::MDataFile(config_->xeonOptions()->md_file,
+                                        config_->xeonOptions()->instrus_filter));  // NOLINT(whitespace/line_length)
     }
 
-    if( !config_->xeonOptions()->speed_md_file.empty() )
-    {
-      speed_file_.reset( new air::MDataFile(config_->xeonOptions()->speed_md_file,
-                                            config_->xeonOptions()->instrus_filter) );
+    if (!config_->xeonOptions()->speed_md_file.empty()) {
+      speed_file_.reset(new air::MDataFile(config_->xeonOptions()->speed_md_file,  // NOLINT(whitespace/line_length)
+                                           config_->xeonOptions()->instrus_filter));  // NOLINT(whitespace/line_length)
     }
 
-    xele_md_spi_.reset( new XeleMdSpiImpl() );
+    xele_md_spi_.reset(new XeleMdSpiImpl());
     xele_md_api_ = CXeleMdApi::CreateMdApi(xele_md_spi_.get());
 
     login();
 
-    if( config_->xeonOptions()->exchange=="cffex" )
-    {
+    if (config_->xeonOptions()->exchange == "cffex") {
       cffexMd();
     }
 #ifdef XELEMD_R972
-    else if( config_->xeonOptions()->exchange=="shfe" )
-    {
+    else if (config_->xeonOptions()->exchange == "shfe") {  // NOLINT(*)
       shfeMd();
     }
 #endif
   }
-  catch( std::exception& e)
-  {
+  catch(std::exception& e) {
     XEON_ERROR <<e.what();
   }
 }
 
-XeonServer::~XeonServer()
-{
+XeonServer::~XeonServer() {
   XEON_TRACE <<"XeonServer::~XeonServer()";
 
   xele_md_api_->Release();
 }
 
-void XeonServer::login()
-{
+void XeonServer::login() {
   XEON_TRACE <<"XeonServer::login()";
 
   CXeleMdFtdcReqUserLoginField login_info;
   memset(&login_info, 0x0, sizeof(login_info));
-  
-  S_INPUT(&login_info, CXeleMdFtdcReqUserLoginField, UserID, config_->xeonOptions()->user_id.data());
-  S_INPUT(&login_info, CXeleMdFtdcReqUserLoginField, Password, soil::Options::escapeHash(config_->xeonOptions()->passwd).data());
-  S_INPUT(&login_info, CXeleMdFtdcReqUserLoginField, ProtocolInfo, "protocol");
+
+  S_INPUT(&login_info, CXeleMdFtdcReqUserLoginField, UserID, config_->xeonOptions()->user_id.data());  // NOLINT(whitespace/line_length)
+  S_INPUT(&login_info, CXeleMdFtdcReqUserLoginField, Password, soil::Options::escapeHash(config_->xeonOptions()->passwd).data());  // NOLINT(whitespace/line_length)
+  S_INPUT(&login_info, CXeleMdFtdcReqUserLoginField, ProtocolInfo, "protocol");  // NOLINT(whitespace/line_length)
 
   XEON_DEBUG <<config_->xeonOptions()->front_address;
   XEON_DEBUG <<config_->xeonOptions()->mcast_address;
@@ -76,121 +68,92 @@ void XeonServer::login()
 
   XEON_DEBUG <<login_info;
 
-  int ret = xele_md_api_->LoginInit(config_->xeonOptions()->front_address.data(),
-                                    config_->xeonOptions()->mcast_address.data(),
+  int ret = xele_md_api_->LoginInit(config_->xeonOptions()->front_address.data(),  // NOLINT(whitespace/line_length)
+                                    config_->xeonOptions()->mcast_address.data(),  // NOLINT(whitespace/line_length)
                                     config_->xeonOptions()->nic.data(),
                                     &login_info);
-  if( ret==XELEAPI_SUCCESS )
-  {
+  if (ret == XELEAPI_SUCCESS) {
     XEON_INFO <<"Login Success.";
-  }
-  else
-  {
+  } else {
     throw std::runtime_error("Login failed.");
   }
-  
 }
 
 #ifdef XELEMD_R972
-void XeonServer::shfeMd()
-{
+void XeonServer::shfeMd() {
   XEON_TRACE <<"XeonServer::shfeMd()";
-  
+
   int handle = xele_md_api_->GetHandle();
-  
+
   CXeleShfeMarketDataUnion mdtick;
   memset(&mdtick, 0x0, sizeof(mdtick));
-  
+
   CXeleShfeLowLevelOneMarketData low_data;
   memset(&low_data, 0x0, sizeof(low_data));
-  
-  do
-  {
-    if (RecvShfeMarketDataTick(handle, &mdtick))
-    {
-      if (mdtick.md_type[0] == 'M')
-      {
-        if( speed_file_.get() )
-        {
-          speed_file_->putData( toSpeedMData(&(mdtick.type_high)) );
+
+  do {
+    if (RecvShfeMarketDataTick(handle, &mdtick)) {
+      if (mdtick.md_type[0] == 'M') {
+        if (speed_file_.get()) {
+          speed_file_->putData(toSpeedMData(&(mdtick.type_high)));
         }
 
-        if( md_file_.get() )
-        {
-          md_file_->putData( toShfeMData(&low_data,  &(mdtick.type_high)) );
+        if (md_file_.get()) {
+          md_file_->putData(toShfeMData(&low_data,  &(mdtick.type_high)));
         }
 
         // XEON_DEBUG <<mdtick.type_high;
-      }
-      else if (mdtick.md_type[0] == 'S')
-      {
+      } else if (mdtick.md_type[0] == 'S') {
         memcpy(&low_data, &(mdtick.type_low), sizeof(low_data));
         // XEON_DEBUG <<mdtick.type_low;
-      }
-      else if (mdtick.md_type[0] == 'Q')
-      {
+      } else if (mdtick.md_type[0] == 'Q') {
         // XEON_DEBUG <<mdtick.type_depth;
       }
     }
-  }while( true );
+  }while(true);
 }
 #endif
 
-void XeonServer::cffexMd()
-{
+void XeonServer::cffexMd() {
   XEON_TRACE <<"XeonServer::cffexMd()";
 
   XEON_INFO <<"version: " <<xele_md_api_->GetVersion();
 
 #ifdef XELEMD_R972
-  int handle = xele_md_api_->GetHandle(); 
+  int handle = xele_md_api_->GetHandle();
 #endif
   MarketDataTick tick;
-  do
-  {
+  do {
 #ifdef XELEMD_R800
-    if( xele_md_api_->RecvMarketDataTick(&tick) )
+    if (xele_md_api_->RecvMarketDataTick(&tick)) {
+#elif defined XELEMD_R972
+    if (RecvMarketDataTick(handle, &tick)) {
 #endif
-      
-#ifdef XELEMD_R972
-    if( RecvMarketDataTick(handle, &tick) )
-#endif
-    {
-
-      if( speed_file_.get() )
-      {
-        speed_file_->putData( toSpeedMData(&(tick.data)) );
+      if (speed_file_.get()) {
+        speed_file_->putData(toSpeedMData(&(tick.data)));
       }
 
-      if( md_file_.get() )
-      {
-        md_file_->putData( toCffexMData(&(tick.data)) );
+      if (md_file_.get()) {
+        md_file_->putData(toCffexMData(&(tick.data)));
       }
-        
     }
-    
-  }while( true );
-  
+  }while(true);
 }
 
-
-air::SpeedMData* XeonServer::toSpeedMData(const CXeleMdFtdcDepthMarketDataField* data)
-{
+air::SpeedMData* XeonServer::toSpeedMData(const CXeleMdFtdcDepthMarketDataField* data) {  // NOLINT(whitespace/line_length)
   std::unique_ptr<air::SpeedMData> speed_data(new air::SpeedMData());
-  
+
   speed_data->instru = data->InstrumentID;
   speed_data->update_time = data->UpdateTime;
   speed_data->update_millisec = data->UpdateMillisec;
 
   return speed_data.release();
-
 }
 
 #ifdef XELEMD_R972
-air::SpeedMData* XeonServer::toSpeedMData(const CXeleShfeHighLevelOneMarketData* data)
-{
+air::SpeedMData* XeonServer::toSpeedMData(const CXeleShfeHighLevelOneMarketData* data) {  // NOLINT(whitespace/line_length)
   std::unique_ptr<air::SpeedMData> speed_data(new air::SpeedMData());
-  
+
   speed_data->instru = data->Instrument;
   speed_data->update_time = data->UpdateTime;
   speed_data->update_millisec = data->UpdateMillisec;
@@ -198,10 +161,10 @@ air::SpeedMData* XeonServer::toSpeedMData(const CXeleShfeHighLevelOneMarketData*
   return speed_data.release();
 }
 
-air::ShfeMData* XeonServer::toShfeMData(const CXeleShfeLowLevelOneMarketData* low_data, const CXeleShfeHighLevelOneMarketData* high_data)
-{
+air::ShfeMData* XeonServer::toShfeMData(const CXeleShfeLowLevelOneMarketData* low_data,  // NOLINT(whitespace/line_length)
+                                        const CXeleShfeHighLevelOneMarketData* high_data) {  // NOLINT(whitespace/line_length)
   std::unique_ptr<air::ShfeMData> shfe_data(new air::ShfeMData());
-  
+
   // shfe_data->TradingDay
   shfe_data->InstrumentID = high_data->Instrument;
   // std::string ExchangeID;
@@ -249,11 +212,9 @@ air::ShfeMData* XeonServer::toShfeMData(const CXeleShfeLowLevelOneMarketData* lo
 
   return shfe_data.release();
 }
-
 #endif
 
-air::CffexMData* XeonServer::toCffexMData(const CXeleMdFtdcDepthMarketDataField* data)
-{
+air::CffexMData* XeonServer::toCffexMData(const CXeleMdFtdcDepthMarketDataField* data) {  // NOLINT(whitespace/line_length)
   std::unique_ptr<air::CffexMData> cffex_data(new air::CffexMData());
 
   // cffex_data->TradingDay = data->TradingDay;
@@ -275,12 +236,12 @@ air::CffexMData* XeonServer::toCffexMData(const CXeleMdFtdcDepthMarketDataField*
   cffex_data->Volume = data->LastPrice;
   cffex_data->Turnover = data->Turnover;
   cffex_data->OpenInterest = data->OpenInterest;
-  
+
   cffex_data->BidPrice1 = data->BidPrice1;
   cffex_data->BidVolume1 = data->BidVolume1;
   cffex_data->AskPrice1 = data->AskPrice1;
   cffex_data->AskVolume1 = data->AskVolume1;
-  
+
   cffex_data->BidPrice2 = data->BidPrice2;
   cffex_data->BidVolume2 = data->BidVolume2;
   cffex_data->AskPrice2 = data->AskPrice2;
@@ -306,7 +267,6 @@ air::CffexMData* XeonServer::toCffexMData(const CXeleMdFtdcDepthMarketDataField*
   cffex_data->UpdateMillisec = data->UpdateMillisec;
 
   return cffex_data.release();
-
 }
 
-};
+}  // namespace xeon
