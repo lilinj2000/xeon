@@ -2,10 +2,6 @@
 
 home_app=~/app
 
-if test -d /llj/app ; then
-   home_app=/llj/app
-fi
-
 home_xeon=${home_app}/xeon
 
 ./configure --prefix=${home_xeon}
