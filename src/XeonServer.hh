@@ -27,12 +27,12 @@ class XeonServer {
 
   void cffexMd();
 
-  #ifdef XELEMD_R972
+#if defined(XELEMD_R972) || defined(XELEMD_R1248)
   void shfeMd();
   air::SpeedMData* toSpeedMData(const CXeleShfeHighLevelOneMarketData* data);
   air::ShfeMData* toShfeMData(const CXeleShfeLowLevelOneMarketData* low_data,
                               const CXeleShfeHighLevelOneMarketData* high_data);
-  #endif
+#endif
 
   air::SpeedMData* toSpeedMData(const CXeleMdFtdcDepthMarketDataField* data);
 

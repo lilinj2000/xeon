@@ -8,6 +8,8 @@
 #include "XeleMdFtdcUserApiStructPrint_r800.hh"
 #elif defined XELEMD_R972
 #include "XeleMdFtdcUserApiStructPrint_r972.hh"
+#elif defined XELEMD_R1248
+#include "XeleMdFtdcUserApiStructPrint_r1248.hh"
 #endif
 
 #endif

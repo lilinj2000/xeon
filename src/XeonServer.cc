@@ -35,11 +35,12 @@ XeonServer::XeonServer(int argc, char* argv[]):
     if (config_->xeonOptions()->exchange == "cffex") {
       cffexMd();
     }
-#ifdef XELEMD_R972
+#if defined(XELEMD_R972) || defined(XELEMD_R1248)
     else if (config_->xeonOptions()->exchange == "shfe") {  // NOLINT(*)
       shfeMd();
     }
 #endif
+
   }
   catch(std::exception& e) {
     XEON_ERROR <<e.what();
@@ -79,7 +80,7 @@ void XeonServer::login() {
   }
 }
 
-#ifdef XELEMD_R972
+#if defined(XELEMD_R972) || defined(XELEMD_R1248)
 void XeonServer::shfeMd() {
   XEON_TRACE <<"XeonServer::shfeMd()";
 
@@ -119,14 +120,15 @@ void XeonServer::cffexMd() {
 
   XEON_INFO <<"version: " <<xele_md_api_->GetVersion();
 
-#ifdef XELEMD_R972
+#if defined(XELEMD_R972) || defined(XELEMD_R1248)
   int handle = xele_md_api_->GetHandle();
 #endif
   MarketDataTick tick;
   do {
 #ifdef XELEMD_R800
     if (xele_md_api_->RecvMarketDataTick(&tick)) {
-#elif defined XELEMD_R972
+#endif
+#if defined(XELEMD_R972) || defined(XELEMD_R1248)
     if (RecvMarketDataTick(handle, &tick)) {
 #endif
       if (speed_file_.get()) {
@@ -150,7 +152,7 @@ air::SpeedMData* XeonServer::toSpeedMData(const CXeleMdFtdcDepthMarketDataField*
   return speed_data.release();
 }
 
-#ifdef XELEMD_R972
+#if defined(XELEMD_R972) || defined(XELEMD_R1248)
 air::SpeedMData* XeonServer::toSpeedMData(const CXeleShfeHighLevelOneMarketData* data) {  // NOLINT(whitespace/line_length)
   std::unique_ptr<air::SpeedMData> speed_data(new air::SpeedMData());
 

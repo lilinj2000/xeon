@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ([2.69])
+AC_PREREQ([2.63])
 AC_INIT(xeon, 0.1, lilinj2000@gmail.com)
 AC_CONFIG_SRCDIR([])
 #AC_CONFIG_HEADERS([config.h])
@@ -54,15 +54,17 @@ BOOST_LIBADD="$BOOST_HOME/lib/libboost_log_setup.so \
 	      $BOOST_HOME/lib/libboost_thread.so \
 	      $BOOST_HOME/lib/libboost_chrono.so \
 	      $BOOST_HOME/lib/libboost_date_time.so \
-	      $BOOST_HOME/lib/libboost_system.so"
+	      $BOOST_HOME/lib/libboost_system.so \
+	      $BOOST_HOME/lib/libboost_atomic.so"
 AC_SUBST(BOOST_CPPFLAGS)
 AC_SUBST(BOOST_LIBADD)
 
 dnl Xele_Md lib
 XELEMD_R800=$home_3rd/xelemd_api_r800
 XELEMD_R972=$home_3rd/xelemd_api_r972
-XELEMD_HOME=$XELEMD_R972
-XELEMD_VER=XELEMD_R972
+XELEMD_R1248=$home_3rd/xelemd_api_r1248
+XELEMD_HOME=$XELEMD_R1248
+XELEMD_VER=XELEMD_R1248
 AC_ARG_WITH([xelemd],
     [AS_HELP_STRING([--with-xelemd],
         [home path of the xelemd, defaults to $XELEMD_HOME])],
